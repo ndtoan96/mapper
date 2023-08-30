@@ -3,6 +3,7 @@ use nom::bytes::complete::*;
 use nom::character::complete::*;
 use nom::combinator::opt;
 use nom::combinator::recognize;
+use nom::multi::many1;
 use nom::sequence::*;
 use nom::IResult;
 
@@ -14,11 +15,23 @@ pub fn empty_till_end_of_line(input: &str) -> IResult<&str, &str> {
 }
 
 pub fn assignment_line(input: &str) -> IResult<&str, &str> {
-    recognize(tuple((space1, address, space1, assignment, line_ending)))(input)
+    recognize(tuple((
+        space1,
+        opt(tag("[")),
+        address,
+        opt(tag("]")),
+        space1,
+        assignment,
+        line_ending,
+    )))(input)
 }
 
 pub fn load_line(input: &str) -> IResult<&str, &str> {
     recognize(tuple((tag("LOAD"), space1, path, empty_till_end_of_line)))(input)
+}
+
+pub fn output_line(input: &str) -> IResult<&str, &str> {
+    recognize(tuple((tag("OUTPUT"), not_line_ending, line_ending)))(input)
 }
 
 pub fn fill_line(input: &str) -> IResult<&str, &str> {
@@ -42,16 +55,18 @@ pub fn symbol_line(input: &str) -> IResult<&str, Symbol> {
 }
 
 pub fn section_declaration(input: &str) -> IResult<&str, Section> {
-    let (input, (sec_name, _, _, addr, _, size, _)) = tuple((
+    let (input, (sec_name, _, _, _, addr, _, size, _, _)) = tuple((
         section_name,
+        space0,
         opt(preceded(
-            tag(" memory region -> "),
-            alt((tag("*default*"), alphanumeric1)),
+            tag("memory region -> "),
+            alt((tag("*default*"), identifier)),
         )),
-        multispace1,
+        multispace0,
         address,
         space1,
         hex_number,
+        opt(tuple((space1, tag("load address"), space1, hex_number))),
         empty_till_end_of_line,
     ))(input)?;
     Ok((
@@ -90,6 +105,37 @@ pub fn file_section(input: &str) -> IResult<&str, FileSection> {
             size,
         },
     ))
+}
+
+pub fn empty_section_line(input: &str) -> IResult<&str, &str> {
+    recognize(pair(section_name, empty_till_end_of_line))(input)
+}
+
+pub fn function_line(input: &str) -> IResult<&str, &str> {
+    recognize(tuple((
+        space1,
+        address,
+        space1,
+        many1(alt((
+            tag(","),
+            tag("("),
+            tag(")"),
+            tag("."),
+            tag(" "),
+            tag("_"),
+            alphanumeric1,
+        ))),
+        empty_till_end_of_line,
+    )))(input)
+}
+
+pub fn comment_line(input: &str) -> IResult<&str, &str> {
+    recognize(tuple((
+        tag("/"),
+        alphanumeric1,
+        tag("/"),
+        empty_till_end_of_line,
+    )))(input)
 }
 
 #[cfg(test)]

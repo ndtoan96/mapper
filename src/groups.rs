@@ -54,6 +54,31 @@ pub fn section_group(input: &str) -> IResult<&str, SectionGroup> {
         Ok((input, None))
     }
 
+    fn empty_section_line_wrapper(input: &str) -> IResult<&str, Option<FileSectionGroup>> {
+        let (input, _) = empty_section_line(input)?;
+        Ok((input, None))
+    }
+
+    fn load_line_wrapper(input: &str) -> IResult<&str, Option<FileSectionGroup>> {
+        let (input, _) = load_line(input)?;
+        Ok((input, None))
+    }
+
+    fn output_line_wrapper(input: &str) -> IResult<&str, Option<FileSectionGroup>> {
+        let (input, _) = output_line(input)?;
+        Ok((input, None))
+    }
+
+    fn function_line_wrapper(input: &str) -> IResult<&str, Option<FileSectionGroup>> {
+        let (input, _) = function_line(input)?;
+        Ok((input, None))
+    }
+
+    fn comment_line_wrapper(input: &str) -> IResult<&str, Option<FileSectionGroup>> {
+        let (input, _) = comment_line(input)?;
+        Ok((input, None))
+    }
+
     let (input, (section, outputs)) = pair(
         section_declaration,
         many0(alt((
@@ -62,6 +87,11 @@ pub fn section_group(input: &str) -> IResult<&str, SectionGroup> {
             fill_line_wrapper,
             empty_till_end_of_line_wrapper,
             section_rule_line_wrapper,
+            empty_section_line_wrapper,
+            load_line_wrapper,
+            output_line_wrapper,
+            function_line_wrapper,
+            comment_line_wrapper,
         ))),
     )(input)?;
 

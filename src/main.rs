@@ -25,8 +25,9 @@ fn parse(input: &str) -> IResult<&str, Vec<SectionGroup>> {
 }
 
 fn main() {
-    let input = fs::read_to_string("relocatable.map").unwrap();
+    // let input = fs::read_to_string("relocatable.map").unwrap();
     // let input = fs::read_to_string("vecuTasks.map").unwrap();
+    let input = fs::read_to_string("DA_MDG1G_4T_23B030D_SILBRANCH.map").unwrap();
     let (input, _) = parse(&input).unwrap();
     println!("{}", &input[..400]);
 }

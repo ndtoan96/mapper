@@ -27,16 +27,12 @@ pub fn symbol(input: &str) -> IResult<&str, &str> {
     recognize(many1(alt((
         tag("_"),
         tag("@"),
-        tag(","),
-        tag("("),
-        tag(")"),
-        tag(" "),
         alphanumeric1,
     ))))(input)
 }
 
 pub fn section_name(input: &str) -> IResult<&str, &str> {
-    recognize(many1(alt((tag("."), tag("$"), alphanumeric1, tag("_")))))(input)
+    recognize(many1(alt((tag("."), tag("$"), tag("_"), alphanumeric1))))(input)
 }
 
 pub fn section_rule(input: &str) -> IResult<&str, &str> {
@@ -48,6 +44,10 @@ pub fn section_rule(input: &str) -> IResult<&str, &str> {
         tag("*"),
         tag("$"),
         tag("_"),
+        tag("-"),
+        tag(" "),
+        tag(":"),
+        tag("?"),
     ))))(input)
 }
 
