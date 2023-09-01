@@ -1,33 +1,30 @@
-use std::fs;
+use clap::{Parser, ValueEnum};
+use mapper::{parse, to_csv, to_json};
+use std::{fs, path::PathBuf};
 
-use nom::branch::alt;
-use nom::multi::many0;
-use nom::sequence::*;
-use nom::IResult;
-
-mod groups;
-mod lines;
-mod types;
-mod units;
-
-use groups::*;
-use lines::*;
-use types::*;
-
-fn parse(input: &str) -> IResult<&str, Vec<SectionGroup>> {
-    preceded(
-        pair(
-            prefix_junk,
-            many0(alt((empty_till_end_of_line, assignment_line, load_line))),
-        ),
-        many0(section_group),
-    )(input)
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum Format {
+    Csv,
+    Json,
 }
 
-fn main() {
-    // let input = fs::read_to_string("relocatable.map").unwrap();
-    // let input = fs::read_to_string("vecuTasks.map").unwrap();
-    let input = fs::read_to_string("DA_MDG1G_4T_23B030D_SILBRANCH.map").unwrap();
-    let (input, _) = parse(&input).unwrap();
-    println!("{}", &input[..400]);
+#[derive(Debug, Parser)]
+#[command(author, version, about)]
+struct Args {
+    #[arg(short, long, value_enum, default_value = "csv", help = "output format")]
+    format: Format,
+    input: PathBuf,
+    #[arg(default_value = "./output")]
+    output: PathBuf,
+}
+
+fn main() -> anyhow::Result<()> {
+    let args = Args::parse();
+    let input = fs::read_to_string(args.input)?;
+    let (_input, output) = parse(&input).unwrap();
+    match args.format {
+        Format::Csv => to_csv(&output, &args.output.with_extension("csv"))?,
+        Format::Json => to_json(&output, &args.output.with_extension("json"))?,
+    }
+    Ok(())
 }

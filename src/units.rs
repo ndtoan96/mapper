@@ -15,7 +15,7 @@ pub fn address(input: &str) -> IResult<&str, &str> {
 pub fn hex_number(input: &str) -> IResult<&str, &str> {
     recognize(pair(
         tag::<_, _, nom::error::Error<&str>>("0x"),
-        nom::bytes::complete::take_while1(|c: char| c.is_digit(16)),
+        nom::bytes::complete::take_while1(|c: char| c.is_ascii_hexdigit()),
     ))(input)
 }
 
@@ -24,11 +24,7 @@ pub fn identifier(input: &str) -> IResult<&str, &str> {
 }
 
 pub fn symbol(input: &str) -> IResult<&str, &str> {
-    recognize(many1(alt((
-        tag("_"),
-        tag("@"),
-        alphanumeric1,
-    ))))(input)
+    recognize(many1(alt((tag("_"), tag("@"), alphanumeric1))))(input)
 }
 
 pub fn section_name(input: &str) -> IResult<&str, &str> {

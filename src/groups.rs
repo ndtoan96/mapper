@@ -96,10 +96,8 @@ pub fn section_group(input: &str) -> IResult<&str, SectionGroup> {
     )(input)?;
 
     let mut file_section_groups = Vec::new();
-    for o in outputs {
-        if let Some(group) = o {
-            file_section_groups.push(group);
-        }
+    for group in outputs.into_iter().flatten() {
+        file_section_groups.push(group);
     }
 
     Ok((
