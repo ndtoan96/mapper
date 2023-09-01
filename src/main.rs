@@ -13,8 +13,12 @@ enum Format {
 struct Args {
     #[arg(short, long, value_enum, default_value = "csv", help = "output format")]
     format: Format,
+    #[arg(help = "input map file")]
     input: PathBuf,
-    #[arg(default_value = "./output")]
+    #[arg(
+        default_value = "./output",
+        help = "output file name (extension will be added according to selected format)"
+    )]
     output: PathBuf,
 }
 
