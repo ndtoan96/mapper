@@ -8,8 +8,8 @@ CLI tool to parse and extract symbols inormation from linker map file
 Usage: mapper.exe [OPTIONS] <INPUT> [OUTPUT]
 
 Arguments:
-  <INPUT>
-  [OUTPUT]  [default: ./output]
+  <INPUT>   input map file
+  [OUTPUT]  output file name (extension will be added according to selected format) [default: ./output]
 
 Options:
   -f, --format <FORMAT>  output format [default: csv] [possible values: csv, json]
