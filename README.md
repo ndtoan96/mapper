@@ -4,6 +4,8 @@
 CLI tool to parse and extract symbols inormation from linker map file
 
 # Usage
+Download the tool [here](https://github.com/ndtoan96/mapper/releases)
+
 ```
 Usage: mapper.exe [OPTIONS] <INPUT> [OUTPUT]
 
